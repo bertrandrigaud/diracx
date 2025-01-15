@@ -374,6 +374,8 @@ async def exchange_token(
 
     # Extract attributes from the OIDC token details
     sub = oidc_token_info["sub"]
+    print("BERTRAND WAS HERE")
+    print(oidc_token_info)
     if user_info := config.Registry[vo].Users.get(sub):
         preferred_username = user_info.PreferedUsername
     else:
