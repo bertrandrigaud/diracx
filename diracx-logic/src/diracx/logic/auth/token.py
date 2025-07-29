@@ -290,10 +290,18 @@ async def exchange_token(
 
     # Extract attributes from the OIDC token details
     sub = oidc_token_info["sub"]
+    print("sub", sub)
+    print("vo", vo)
+    print("dirac_group", dirac_group)
+    print("properties", properties)
     if user_info := config.Registry[vo].Users.get(sub):
         preferred_username = user_info.PreferedUsername
+        print("user_info", user_info)
+        print("preferred_username", preferred_username)
     else:
         preferred_username = oidc_token_info.get("preferred_username", sub)
+        print("oidc_token_info")
+        print("preferred_username", preferred_username)
         raise NotImplementedError(
             "Dynamic registration of users is not yet implemented"
         )
