@@ -185,6 +185,8 @@ async def get_token_from_iam(
             raise IAMClientError("Failed to contact IAM server")
 
     raw_id_token = res.json()["id_token"]
+
+    print(f"raw_id_token {raw_id_token}")
     # Extract the payload and verify it
     try:
         id_token = await parse_id_token(
@@ -192,9 +194,11 @@ async def get_token_from_iam(
             vo=vo,
             raw_id_token=raw_id_token,
         )
+        print(f"id_token {id_token}")
     except ValueError:
         raise
 
+    print(f"id_token {id_token}")
     return id_token
 
 
