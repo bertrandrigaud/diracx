@@ -307,7 +307,7 @@ async def exchange_token(
         logger.info("oidc_token_info")
         logger.info("preferred_username %s", preferred_username)
         raise NotImplementedError(
-            "Dynamic registration of users is not yet implemented"
+            f"Dynamic registration of users is not yet implemented {sub} {vo} {dirac_group} {properties}"
         )
 
     # Check that the subject is part of the dirac users
