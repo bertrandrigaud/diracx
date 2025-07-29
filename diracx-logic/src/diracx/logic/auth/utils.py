@@ -168,11 +168,11 @@ async def get_token_from_iam(
     }
 
     print("HERE I AM!")
-    print(data['grant_type'])
-    print(data['client_id'])
-    print(data['code'])
-    print(data['code_verifier'])
-    print(data['redirect_uri'])
+    print(f"grant_type {data['grant_type']}")
+    print(f"client_id {data['client_id']}")
+    print(f"code {data['code']}")
+    print(f"code_verifier {data['code_verifier']}")
+    print(f"redirect_uri {data['redirect_uri']}")
     
     async with httpx.AsyncClient() as c:
         res = await c.post(
