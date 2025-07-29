@@ -170,6 +170,7 @@ async def get_token_from_iam(
     print("HERE I AM!")
     print(data['grant_type'])
     print(data['client_id'])
+    print(data['code'])
     print(data['code_verifier'])
     print(data['redirect_uri'])
     
