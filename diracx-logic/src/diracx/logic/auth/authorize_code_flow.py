@@ -92,7 +92,7 @@ async def complete_authorization_flow(
         request_url,
     )
 
-    pprint(f"id_token {id_token}")
+    print(f"id_token {id_token}")
 
     # Store the ID token and redirect the user to the client's redirect URI
     code, redirect_uri = await auth_db.authorization_flow_insert_id_token(
