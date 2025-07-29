@@ -179,6 +179,9 @@ async def get_token_from_iam(
             token_endpoint,
             data=data,
         )
+        print(f"token_endpoint {token_endpoint}")
+        print(f"data {data}")
+        print(f"res {res}")
         if res.status_code >= 500:
             raise IAMServerError("Failed to contact IAM server")
         elif res.status_code >= 400:
