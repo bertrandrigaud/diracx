@@ -76,10 +76,13 @@ async def complete_authorization_flow(
     settings: AuthSettings,
 ) -> str:
     """Complete the authorization flow."""
+
+    print("complete_authorization_flow")
+    
     # Decrypt the state to access user details
     decrypted_state = decrypt_state(state, settings.state_key.fernet)
     assert decrypted_state["grant_type"] == GrantType.authorization_code
-
+    print(f"decrypted_state {decrypted_state}")
     # Get the ID token from the IAM
     id_token = await get_token_from_iam(
         config,
@@ -89,7 +92,7 @@ async def complete_authorization_flow(
         request_url,
     )
 
-    print(id_token)
+    pprint(f"id_token {id_token}")
 
     # Store the ID token and redirect the user to the client's redirect URI
     code, redirect_uri = await auth_db.authorization_flow_insert_id_token(
