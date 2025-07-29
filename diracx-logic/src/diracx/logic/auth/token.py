@@ -37,6 +37,10 @@ from .utils import (
 )
 
 
+import logging
+logger = logging.getLogger(__name__)
+
+
 async def get_oidc_token(
     grant_type: GrantType,
     client_id: str,
