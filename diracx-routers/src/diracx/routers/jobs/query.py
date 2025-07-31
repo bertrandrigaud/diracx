@@ -142,6 +142,9 @@ async def search(
 
     **TODO: Add more docs**
     """
+
+    print(user_info)
+    
     await check_permissions(action=ActionType.QUERY, job_db=job_db)
 
     preferred_username: str | None = user_info.preferred_username
@@ -158,6 +161,9 @@ async def search(
         per_page=per_page,
         body=body,
     )
+
+    print(total)
+    print(jobs)
 
     # Set the Content-Range header if needed
     # https://datatracker.ietf.org/doc/html/rfc7233#section-4
