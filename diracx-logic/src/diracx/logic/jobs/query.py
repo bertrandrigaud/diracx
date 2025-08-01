@@ -63,6 +63,7 @@ async def search(
         )
 
     pprint(">>> BERTRAND", body)
+    logger.info(">>> BERTRAND body %s", body)
 
     total, jobs = await job_db.search(
         body.parameters,
@@ -74,6 +75,7 @@ async def search(
     )
 
     pprint(">>> BERTRAND", total, jobs)
+    logger.info(">>> BERTRAND total %d jobs %s", total, jobs)
 
     if query_logging_info:
         job_logging_info = await job_logging_db.get_records(
