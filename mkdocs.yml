@@ -54,9 +54,9 @@ nav:
     - user/index.md
     - Getting started: user/tutorials/getting-started.md
     - Known installations: user/reference/known-installations.md
-    - DiracX Web:
+    - Web:
       - user/web/index.md
-      - Getting started: user/web/getting-started.md
+      - Logging in: user/web/login_out.md
     - Programmatic Usage:
       - user/reference/programmatic-usage/index.md
       - Command Line: user/reference/programmatic-usage/command-line-interface.md
@@ -77,10 +77,12 @@ nav:
       - Register the admin VO: admin/how-to/register-the-admin-vo.md
       - Debugging: admin/how-to/debugging.md
       - Upgrading: admin/how-to/upgrading.md
+      - Rotate a secret: admin/how-to/rotate-a-secret.md
     - Explanations:
       - Configuration: admin/explanations/configuration.md
       - OpenTelemetry: admin/explanations/opentelemetry.md
       - Chart structure: admin/explanations/chart-structure.md
+      - Databases: docs/admin/explanations/database-management.md
     - Reference:
       - Security Model: admin/reference/security_model.md
       - Charts values: admin/reference/values.md
@@ -95,6 +97,7 @@ nav:
       - Play with auth: dev/tutorials/play-with-auth.md
     - How-To:
       - Contribute: dev/how-to/contribute.md
+      - Write docs: dev/how-to/write-docs.md
       - Add functionality:
         - dev/how-to/add-functionality/index.md
         - New route or router: dev/how-to/add-a-route.md
@@ -103,32 +106,30 @@ nav:
         - New CLI command: dev/how-to/add-a-cli-command.md
         - New settings: dev/how-to/add-a-setting.md
       - Develop legacy DIRAC: dev/how-to/develop-legacy-dirac.md
-      - Client customization: dev/how-to/client-customization.md
-      - Client generation: dev/how-to/client-generation.md
       - Use the demo:
         - dev/how-to/use-the-demo/index.md
         - Accessing the client: dev/how-to/use-the-demo/swagger.md
         - Use swagger: dev/how-to/use-the-demo/swagger.md
         - Accessing DiracX Web: dev/how-to/use-the-demo/web.md
-      - Write docs: dev/how-to/write-docs.md
+      - Client customization: dev/how-to/client-customization.md
+      - Client generation: dev/how-to/client-generation.md
+      - Client extensions: dev/how-to/client-extension.md
     - Explanations:
       - Components:
         - Introduction: dev/explanations/components/index.md
         - API: dev/explanations/components/api.md
         - CLI: dev/explanations/components/cli.md
-        - DataBases: dev/explanations/components/db.md
+        - Databases: dev/explanations/components/db.md
         - Routes: dev/explanations/components/routes.md
       - Client: dev/explanations/client.md
       - Testing: dev/explanations/testing.md
       - Run demo: dev/explanations/run_demo.md
+      - Extensions: dev/explanations/extensions.md
     - Reference:
       - Writing tests: dev/reference/writing-tests.md
       - Coding conventions: dev/reference/coding-conventions.md
       - Configuration: dev/reference/configuration.md
       - Dependency injection: dev/reference/dependency-injection.md
-  - Project Info:
-    - Introduction: project/index.md
-    - Consortium: project/consortium.md
 
 markdown_extensions:
   - admonition
