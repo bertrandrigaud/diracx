@@ -6,7 +6,8 @@ from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
 
-from diracx.core.properties import JOB_ADMINISTRATOR, NORMAL_USER
+from diracx.core.models import VectorSearchOperator
+from diracx.core.properties import GENERIC_PILOT, JOB_ADMINISTRATOR, NORMAL_USER
 from diracx.db.sql import JobDB, SandboxMetadataDB
 from diracx.routers.access_policies import BaseAccessPolicy
 from diracx.routers.utils.users import AuthorizedUserInfo
@@ -61,6 +62,10 @@ class WMSAccessPolicy(BaseAccessPolicy):
                 raise HTTPException(status.HTTP_403_FORBIDDEN)
             return
 
+        if GENERIC_PILOT in user_info.properties and action == ActionType.MANAGE:
+            # Authorize pilots
+            return
+
         if JOB_ADMINISTRATOR in user_info.properties:
             return
 
@@ -84,7 +89,13 @@ class WMSAccessPolicy(BaseAccessPolicy):
         # to the current user
         job_owners = await job_db.summary(
             ["Owner", "VO"],
-            [{"parameter": "JobID", "operator": "in", "values": job_ids}],
+            [
+                {
+                    "parameter": "JobID",
+                    "operator": VectorSearchOperator.IN,
+                    "values": job_ids,
+                }
+            ],
         )
 
         expected_owner = {
