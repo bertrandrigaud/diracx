@@ -1,19 +1,22 @@
 # Extensions
 
-DiracX supports the concept of extensions to modify and extend it's functionality to meet community specific needs.
+DiracX supports the concept of extensions to modify and extend its functionality to meet community specific needs.
 This is typically done by larger installations that serve a single virtual organization and for whom community specific workflows are well established.
-While DiracX extensions are a powerful and flexible tool, they also require ongoing maintenance to follow upstream DiracX changes.
-Before embarking on this journey, consider contributing to DiracX itself and avoiding all of the long term maintenance costs.
+
+??? note "Extensions require maintenance !"
+
+    While DiracX extensions are a powerful and flexible tool, they also require ongoing maintenance to follow upstream DiracX changes.
+    Before embarking on this journey, consider contributing to DiracX itself and avoiding all of the long term maintenance costs.
 
 ## Do you need an extension?
 
 Before going any further you should consider if you even need a DiracX extension.
 Creating a standard python package which uses the [DiracX Python API](../../user/reference/programmatic-usage/python-interface.md) might be a better choice as this will be more stable over time and leave you with more flexibility in how you implement your code.
-For example, if you wish to create a job submission framework which let's people submit specialized jobs, monitor their status and then download data you're likely best off not making a DiracX extension.
+For example, if you wish to create a job submission framework that lets people submit specialized jobs, monitor their status and then download data you're likely best off not making a DiracX extension.
 
-Alternatively, you should make an extension if you want to:
+Alternatively, you should make an extension if you want for example to:
 
-- Add a custom metadata and province catalog with deep integration into the transformation system based on the specific workflows if your community.
+- Add a custom metadata and provenance catalog with deep integration into the transformation system based on the specific workflows of your community.
 - Interact directly with the DiracX databases for automating installation specific operational tasks.
 - Customize the authorization logic
 
@@ -39,10 +42,12 @@ More details about this can be found in the [dedicated how to](../how-to/client-
 
 It should also serve as a reference doc on how to write your own extension. Everything in the `diracx` dev documentation applies here too.
 If you write your own extension, just replace `gubbins` with whatever name you chose (e.g. `lhcbdiracx`, `belle2diracx`, `donotforgetgriddpp`).
-The structure of the repo, the content of the `pyproject.toml` files, the `__init__.py` of the modules... are all skeletons that you must reproduce.
+The structure of the repo, the content of the `pyproject.toml` files, the `__init__.py` of the modules are all skeletons that you must reproduce.
 It is not required to reproduce all submodules (e.g. you can have `myextension-cli` without having any other components).
-**Any use cases not included in `gubbins` are not supported.**
-If you think you need additional functionality please open an issue to discuss so it can be added here to assist with long term stability.
+
+!!! danger "Any use cases not included in `gubbins` are not supported."
+
+    If you think you need additional functionality please open an issue to discuss so it can be added here to assist with long term stability.
 
 Most functionality is managed via entrypoints in the various `pyproject.toml` files.
 The only essential one to have is:
@@ -62,7 +67,7 @@ To find out more about the entrypoints available for extensions, see [here](../r
     As `gubbins` is hosted in the main DiracX repository there are a couple of things that would need to be changed for a standard extension:
 
     - `root = "../../.."` in `pyproject.toml` should be `root = ".."` (i.e. the path to the root of your repository)
-    - The [GitHub actions file](%60%60.github/workflows/extensions.yaml%60%60) should in fact be split in multiple jobs under `.github/workflows/` of your repo.
+    - The GitHub actions file `.github/workflows/extensions.yaml` should in fact be split in multiple jobs under `.github/workflows/` of your repo.
 
 ## Installing the extension
 
@@ -74,17 +79,17 @@ The `gubbins-db` package contains the extension for the DB.
 
 ### New DB
 
-`lollygag` is a DB which is specific to `gubbins`, i.e. it does not modify or extend an existing `diracx` db
+`lollygagDB` is a DB which is specific to `gubbins`, i.e. it does not modify or extend an existing `diracx` db
 
 ### Extended DB
 
 `GubbinsJobDB` illustrates how to extend an existing `diracx` DB, add new methods, modify methods, add a table.
 
-A [router test](extensions/gubbins/gubbins-routers/tests/test_gubbins_job_manager.py) exists, even though no router is redefined. It is just to show that the correct DB is being loaded.
+A router test exists (`test_gubbins_job_manager.py`), even though no router is redefined. It is just to show that the correct DB is being loaded.
 
 !!! warning
 
-    In the [test dependency](gubbins/gubbins-routers/tests/test_gubbins_job_manager.py), you need to specify both the original DiracX `JobDB` as well as the extended one `GubbinsJobDB`. To avoid that inconvenience, reuse the same name (i.e. `JobDB` instead of `GubbinsJobDB`).
+    In the test dependency, you need to specify both the original DiracX `JobDB` as well as the extended one `GubbinsJobDB`. To avoid that inconvenience, reuse the same name (i.e. `JobDB` instead of `GubbinsJobDB`).
 
 ## `gubbins-routers`
 
@@ -127,9 +132,9 @@ with open("/tmp/openapi.json", "wt") as f:
 autorest --python --input-file=/tmp/openapi.json --models-mode=msrest --namespace=generated --output-folder=gubbins-client/src/gubbins/
 ```
 
-- Create the `patches` directory, simply exporting the generated `clients`(both [sync](gubbins/gubbins-client/src/gubbins/client/patches/__init__.py) and [async](gubbins/gubbins-client/src/gubbins/client/patches/aio/__init__.py))
+- Create the `patches` directory, simply exporting the generated `clients` (both sync and async)
 - Define the base modules to export what is needed
-- The [top init](gubbins/gubbins-client/src/gubbins/client/__init__.py) MUST have
+- The top init file MUST have
 
 ```python
 import diracx.client
@@ -179,7 +184,7 @@ Only extending the configuration is allowed. For example, you can add extra fiel
 
 You need to:
 
-- Redefine a new configuration [schema](gubbins/gubbins-core/src/gubbins/core/config/schema.py)
+- Redefine a new configuration schema
 - Declare this new class in the `diracx` entrypoint
 
 ```toml
@@ -187,7 +192,7 @@ You need to:
 config = "gubbins.core.config.schema:Config"
 ```
 
-- Redefine a dependency for your routers to use (see [example](gubbins/gubbins-routers/src/gubbins/routers/dependencies.py))
+- Redefine a dependency for your routers to use
 
 ### Properties
 
@@ -198,10 +203,14 @@ Properties can only be added. This is done in the `gubbins-core` `pyproject.toml
 properties_module = "gubbins.core.properties"
 ```
 
-[properties](gubbins/gubbins-core/src/gubbins/core/properties.py) illustrates how to do it
+The gubbins properties module illustrates how to do it
 
 ## `gubbins-testing`
 
 `diracx-testing` package contains a lot of useful tools for testing `diracx` and its extensions.
 
 Note that even if you have your own `testing` package depending on `diracx-testing`, you should specify it when calling `pytest` (see various `pyprojects.toml`)
+
+## `Dockerfile`
+
+`extensions/containers/services/Dockerfile` contains an example of `Dockerfile` for extensions.

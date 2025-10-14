@@ -7,6 +7,9 @@ default_install_hook_types:
 default_language_version:
   python: python3
 
+ci:
+  skip: [generate-pixi-docs]
+
 default_stages: [pre-commit]
 
 repos:
@@ -18,7 +21,7 @@ repos:
         args: ["--verbose"]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -27,14 +30,14 @@ repos:
       - id: check-added-large-files
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 'v0.12.7'
+    rev: 'v0.13.3'
     hooks:
       - id: ruff
         args: ["--fix", "--show-fixes"]
       - id: ruff-format
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.17.1
+    rev: v1.18.2
     hooks:
       - id: mypy
         additional_dependencies:
@@ -62,3 +65,21 @@ repos:
     hooks:
     - id: codespell
       args: ["-w"]
+
+  - repo: local
+    hooks:
+      - id: check-lollygag
+        name: check for lollygag
+        types: [python]
+        entry: '(?i)lollygag'
+        language: pygrep
+        files: ^diracx
+
+  - repo: local
+    hooks:
+      - id: generate-pixi-docs
+        name: Generate pixi tasks documentation
+        entry: pixi run -e default python .github/workflows/generate_pixi_tasks_doc.py
+        language: system
+        pass_filenames: false
+        files: ^pixi\.toml$|^pixi\.lock$   # only run if pixi files change

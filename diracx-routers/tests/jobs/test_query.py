@@ -192,7 +192,19 @@ def test_insert_malformed_jdl(normal_user_client):
     assert r.status_code == 400, r.json()
 
 
-@freeze_time("2024-01-01T00:00:00.123456Z")
+# "2024-01-01 00:00:00.123456"
+@freeze_time(
+    datetime(
+        year=2024,
+        month=1,
+        day=1,
+        hour=0,
+        minute=0,
+        second=0,
+        microsecond=123456,
+        tzinfo=timezone.utc,
+    )
+)
 def test_insert_and_search_by_datetime(normal_user_client):
     """Test inserting a job and then searching for it.
 
@@ -204,6 +216,10 @@ def test_insert_and_search_by_datetime(normal_user_client):
     listed_jobs = r.json()
     assert r.status_code == 200, listed_jobs
     assert len(listed_jobs) == len(job_definitions)
+    r = normal_user_client.post("/api/jobs/search")
+    assert len(r.json()) == 1, "No jobs submitted"
+
+    submitted_jobs_info = r.json()
 
     # 1.1 Search for all jobs submitted in 2024
     r = normal_user_client.post(
@@ -219,7 +235,7 @@ def test_insert_and_search_by_datetime(normal_user_client):
         },
     )
     assert r.status_code == 200, r.json()
-    assert len(r.json()) == 1
+    assert len(r.json()) == 1, f"submitted jobs were: {submitted_jobs_info!r}"
 
     # 1.2 Search for all jobs submitted before 2024
     r = normal_user_client.post(
@@ -862,7 +878,7 @@ def test_get_job_status_history_in_bulk(
     assert r.json()[str(valid_job_id)][0]["Source"] == "JobManager"
 
 
-def test_patch_summary(normal_user_client: TestClient, valid_job_id: int):
+def test_summary(normal_user_client: TestClient, valid_job_id: int):
     """Test that the summary endpoint works as expected."""
     r = normal_user_client.post(
         "/api/jobs/summary",
@@ -888,7 +904,7 @@ def test_patch_summary(normal_user_client: TestClient, valid_job_id: int):
     assert r.json() == [{"Owner": "preferred_username", "count": 1}]
 
 
-def test_patch_summary_doc_example(normal_user_client: TestClient, valid_job_id: int):
+def test_summary_doc_example(normal_user_client: TestClient, valid_job_id: int):
     """Test that the summary doc example is correct."""
     payload = EXAMPLE_SUMMARY["Group by JobGroup"]["value"]
     r = normal_user_client.post("/api/jobs/summary", json=payload)

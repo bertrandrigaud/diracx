@@ -1,9 +1,10 @@
 # Databases
 
 TODO: review
+TODO: add transactions info
 
 The primary store of operational data in DiracX is in SQL databases managed through SQLAlchemy.
-In addition, DiracX utilizes OpenSearch (or Elasticsearch) for storing pilot logs, medium-term metadata about jobs and pilots ("Job Parameters" and "Pilot Parameters"), and optionally, for OpenTelemetry data.
+In addition, DiracX utilizes OpenSearch for storing pilot logs, medium-term metadata about jobs and pilots ("Job Parameters" and "Pilot Parameters"), and optionally, for OpenTelemetry data (for the time being, ElasticSearch is necessary as Opensearch does not fully support OTEL).
 Access to databases is managed by the `diracx-db` package.
 
 ## SQL Databases
@@ -28,6 +29,14 @@ See the DiracX helm chart for more details about configuring access to databases
 ### Using SQL databases
 
 See the services/tasks documentation for details about how the database classes should be used.
+
+### Aside on datetimes in MySQL
+
+Dates and times in MySQL (`DATETIME` type) are stored as naive UTC timestamps. They are returned as UTC.
+
+MySQL `TIMESTAMP` types should be treated with caution as they are stored as naive UTC timestamps but returned in the local timezone according to the server's timezone setting. https://dev.mysql.com/doc/refman/8.4/en/server-system-variables.html#sysvar_time_zone
+
+See MySQL docs: https://dev.mysql.com/doc/refman/8.4/en/datetime.html
 
 ### API
 

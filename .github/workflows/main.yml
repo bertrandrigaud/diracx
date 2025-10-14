@@ -13,26 +13,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
   shellcheck:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-      - uses: prefix-dev/setup-pixi@v0.8.12
+        uses: actions/checkout@v5
+      - uses: prefix-dev/setup-pixi@v0.9.1
         with:
           run-install: false
           post-cleanup: false
-      - name: Apply workarounds
-        run: |
-          # Workaround for https://github.com/prefix-dev/pixi/issues/3762
-          sed -i.bak 's@editable = true@editable = false@g' pixi.toml
-          rm pixi.toml.bak
-          # Add annotations to github actions
-          pixi add --no-install --pypi --feature diracx-core pytest-github-actions-annotate-failures
-          # Show any changes
-          git diff
-      - uses: prefix-dev/setup-pixi@v0.8.12
+      - uses: prefix-dev/setup-pixi@v0.9.1
         with:
           cache: false
           environments: shellcheck
@@ -62,8 +52,8 @@ jobs:
           - gubbins-cli
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-      - uses: prefix-dev/setup-pixi@v0.8.12
+        uses: actions/checkout@v5
+      - uses: prefix-dev/setup-pixi@v0.9.1
         with:
           run-install: false
           post-cleanup: false
@@ -72,18 +62,16 @@ jobs:
           # Workaround for https://github.com/prefix-dev/pixi/issues/3762
           sed -i.bak 's@editable = true@editable = false@g' pixi.toml
           rm pixi.toml.bak
-          # Add annotations to github actions
-          pixi add --no-install --pypi --feature diracx-core pytest-github-actions-annotate-failures
           # Show any changes
           git diff
-      - uses: prefix-dev/setup-pixi@v0.8.12
+      - uses: prefix-dev/setup-pixi@v0.9.1
         with:
           cache: false
           environments: ${{ matrix.package }}
       - name: Run pytest
         run: pixi run pytest-${{ matrix.package }} --cov-report=xml:coverage.xml --junitxml=report.xml
       - name: Upload coverage report
-        uses: codecov/codecov-action@v5.4.3
+        uses: codecov/codecov-action@v5.5.1
 
   pytest-integration:
     runs-on: ubuntu-latest
@@ -94,9 +82,29 @@ jobs:
           - diracx
           - gubbins
     steps:
+      - name: Free disk space
+        run: |
+          echo "Before cleanup:"
+          df -h
+
+          # remove .NET SDKs
+          sudo rm -rf /usr/share/dotnet || true
+          # remove Android SDK
+          sudo rm -rf usr/local/lib/android || true
+          # remove Haskell Compiler
+          sudo rm -rf /opt/ghc || true
+          sudo rm -rf /usr/local/.ghcup || true
+
+          sudo apt-get clean || echo "::warning::The command [sudo apt-get clean] failed to complete successfully. Proceeding..."
+
+          # prune docker
+          docker system prune -af || true
+
+          echo "After cleanup:"
+          df -h
       - name: Checkout code
-        uses: actions/checkout@v4
-      - uses: prefix-dev/setup-pixi@v0.8.12
+        uses: actions/checkout@v5
+      - uses: prefix-dev/setup-pixi@v0.9.1
         with:
           run-install: false
           post-cleanup: false
@@ -105,11 +113,9 @@ jobs:
           # Workaround for https://github.com/prefix-dev/pixi/issues/3762
           sed -i.bak 's@editable = true@editable = false@g' pixi.toml
           rm pixi.toml.bak
-          # Add annotations to github actions
-          pixi add --no-install --pypi --feature diracx-core pytest-github-actions-annotate-failures
           # Show any changes
           git diff
-      - uses: prefix-dev/setup-pixi@v0.8.12
+      - uses: prefix-dev/setup-pixi@v0.9.1
         with:
           cache: false
           environments: ${{ matrix.extension == 'diracx' && 'default' || 'default-gubbins' }}
@@ -149,6 +155,9 @@ jobs:
         if: ${{ matrix.extension == 'gubbins' }}
         run: |
           docker load --input /tmp/gubbins_services_image.tar
+          # Free up disk space by removing the tarball after loading the image
+          rm -Rf /tmp/gubbins_services_image.tar
+          docker builder prune -af || true
           docker image ls -a
       - name: Start demo
         run: |
@@ -166,7 +175,7 @@ jobs:
           if [ ${{ matrix.extension }} == 'gubbins' ]; then
             # We have to copy the code to another directory
             # and make it a git repository by itself because otherwise the
-            # root in the pyproject to do not make sense once mounted
+            # root in the pyproject do not make sense once mounted
             # in the containers.
             cp -r ./extensions/gubbins /tmp/
             sed -i 's@../..@.@g' /tmp/gubbins/pyproject.toml
@@ -209,7 +218,7 @@ jobs:
         run: |
           pixi run -e ${{ matrix.extension == 'diracx' && 'default' || 'default-gubbins' }} python -m diracx.testing coverage collect-demo --demo-dir=../diracx-charts/.demo
       - name: Upload coverage report
-        uses: codecov/codecov-action@v5.4.3
+        uses: codecov/codecov-action@v5.5.1
         with:
           files: ./coverage-pytest.xml,./coverage-demo.xml
 
@@ -221,18 +230,12 @@ jobs:
         package: [diracx, gubbins]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-      - uses: prefix-dev/setup-pixi@v0.8.12
+        uses: actions/checkout@v5
+      - uses: prefix-dev/setup-pixi@v0.9.1
         with:
           run-install: false
           post-cleanup: false
-      - name: Apply workarounds
-        run: |
-          # Add annotations to github actions
-          pixi add --no-install --pypi --feature diracx-core pytest-github-actions-annotate-failures
-          # Show any changes
-          git diff
-      - uses: prefix-dev/setup-pixi@v0.8.12
+      - uses: prefix-dev/setup-pixi@v0.9.1
         with:
           cache: false
           locked: false

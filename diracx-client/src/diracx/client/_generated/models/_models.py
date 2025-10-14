@@ -94,6 +94,46 @@ class BodyAuthGetOidcTokenGrantType(_serialization.Model):
     """OAuth2 Grant type."""
 
 
+class BodyAuthRevokeRefreshTokenByRefreshToken(_serialization.Model):
+    """Body_auth_revoke_refresh_token_by_refresh_token.
+
+    All required parameters must be populated in order to send to server.
+
+    :ivar token: The refresh token to revoke. Required.
+    :vartype token: str
+    :ivar token_type_hint: Hint for the type of token being revoked.
+    :vartype token_type_hint: str
+    :ivar client_id: The client ID of the application requesting the revocation.
+    :vartype client_id: str
+    """
+
+    _validation = {
+        "token": {"required": True},
+    }
+
+    _attribute_map = {
+        "token": {"key": "token", "type": "str"},
+        "token_type_hint": {"key": "token_type_hint", "type": "str"},
+        "client_id": {"key": "client_id", "type": "str"},
+    }
+
+    def __init__(
+        self, *, token: str, token_type_hint: Optional[str] = None, client_id: str = "myDIRACClientID", **kwargs: Any
+    ) -> None:
+        """
+        :keyword token: The refresh token to revoke. Required.
+        :paramtype token: str
+        :keyword token_type_hint: Hint for the type of token being revoked.
+        :paramtype token_type_hint: str
+        :keyword client_id: The client ID of the application requesting the revocation.
+        :paramtype client_id: str
+        """
+        super().__init__(**kwargs)
+        self.token = token
+        self.token_type_hint = token_type_hint
+        self.client_id = client_id
+
+
 class BodyJobsRescheduleJobs(_serialization.Model):
     """Body_jobs_reschedule_jobs.
 
@@ -413,6 +453,9 @@ class JobCommand(_serialization.Model):
 class JobMetaData(_serialization.Model):
     """A model that combines both JobAttributes and JobParameters.
 
+    :ivar additional_properties: Unmatched properties from the message are deserialized to this
+     collection.
+    :vartype additional_properties: dict[str, any]
     :ivar timestamp: Timestamp.
     :vartype timestamp: ~datetime.datetime
     :ivar cpu_normalization_factor: Cpunormalizationfactor.
@@ -486,6 +529,7 @@ class JobMetaData(_serialization.Model):
     """
 
     _attribute_map = {
+        "additional_properties": {"key": "", "type": "{object}"},
         "timestamp": {"key": "timestamp", "type": "iso-8601"},
         "cpu_normalization_factor": {"key": "CPUNormalizationFactor", "type": "int"},
         "norm_cpu_time_s": {"key": "NormCPUTime(s)", "type": "int"},
@@ -526,6 +570,7 @@ class JobMetaData(_serialization.Model):
     def __init__(  # pylint: disable=too-many-locals
         self,
         *,
+        additional_properties: Optional[Dict[str, Any]] = None,
         timestamp: Optional[datetime.datetime] = None,
         cpu_normalization_factor: Optional[int] = None,
         norm_cpu_time_s: Optional[int] = None,
@@ -564,6 +609,9 @@ class JobMetaData(_serialization.Model):
         **kwargs: Any
     ) -> None:
         """
+        :keyword additional_properties: Unmatched properties from the message are deserialized to this
+         collection.
+        :paramtype additional_properties: dict[str, any]
         :keyword timestamp: Timestamp.
         :paramtype timestamp: ~datetime.datetime
         :keyword cpu_normalization_factor: Cpunormalizationfactor.
@@ -636,6 +684,7 @@ class JobMetaData(_serialization.Model):
         :paramtype accounted_flag: ~_generated.models.JobMetaDataAccountedFlag
         """
         super().__init__(**kwargs)
+        self.additional_properties = additional_properties
         self.timestamp = timestamp
         self.cpu_normalization_factor = cpu_normalization_factor
         self.norm_cpu_time_s = norm_cpu_time_s
@@ -930,7 +979,7 @@ class SandboxInfo(_serialization.Model):
     :vartype checksum: str
     :ivar size: Size. Required.
     :vartype size: int
-    :ivar format: SandboxFormat. Required. "tar.bz2"
+    :ivar format: SandboxFormat. Required. Known values are: "tar.bz2" and "tar.zst".
     :vartype format: str or ~_generated.models.SandboxFormat
     """
 
@@ -964,7 +1013,7 @@ class SandboxInfo(_serialization.Model):
         :paramtype checksum: str
         :keyword size: Size. Required.
         :paramtype size: int
-        :keyword format: SandboxFormat. Required. "tar.bz2"
+        :keyword format: SandboxFormat. Required. Known values are: "tar.bz2" and "tar.zst".
         :paramtype format: str or ~_generated.models.SandboxFormat
         """
         super().__init__(**kwargs)

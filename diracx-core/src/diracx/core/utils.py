@@ -7,19 +7,21 @@ __all__ = [
     "write_credentials",
     "TwoLevelCache",
     "batched_async",
+    "recursive_merge",
 ]
 
 import fcntl
 import json
 import os
 import re
+import stat
 import threading
 from collections import defaultdict
 from collections.abc import Callable
 from concurrent.futures import Future, ThreadPoolExecutor, wait
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any, AsyncIterable, TypeVar
+from typing import Any, AsyncIterable, TypeVar, overload
 
 from cachetools import Cache, TTLCache
 
@@ -29,6 +31,32 @@ from diracx.core.models import TokenResponse
 EXPIRES_GRACE_SECONDS = 15
 
 T = TypeVar("T")
+
+
+@overload
+def recursive_merge(base: T, override: None) -> T: ...
+@overload
+def recursive_merge(base: None, override: T) -> T: ...
+@overload
+def recursive_merge(base: T, override: T) -> T: ...
+def recursive_merge(base: Any, override: Any) -> Any:
+    """Recursively merge dictionaries; values in ``override`` take precedence.
+
+    - If both ``base`` and ``override`` are dicts, merge keys recursively.
+    - Otherwise, return ``override`` if it is not ``None``; fallback to ``base``.
+    """
+    if isinstance(base, dict) and isinstance(override, dict):
+        merged: dict[str, Any] = {}
+        for key, base_val in base.items():
+            if key in override:
+                merged[key] = recursive_merge(base_val, override[key])
+            else:
+                merged[key] = base_val
+        for key, override_val in override.items():
+            if key not in merged:
+                merged[key] = override_val
+        return merged
+    return override if override is not None else base
 
 
 def dotenv_files_from_environment(prefix: str) -> list[str]:
@@ -91,7 +119,14 @@ def write_credentials(token_response: TokenResponse, *, location: Path | None = 
     credentials_path = location or get_diracx_preferences().credentials_path
     credentials_path.parent.mkdir(parents=True, exist_ok=True)
 
-    with open(credentials_path, "w") as f:
+    # Open a file and set the permissions to 0x600
+    file_descriptor = os.open(
+        path=credentials_path,
+        flags=os.O_WRONLY | os.O_CREAT | os.O_TRUNC,
+        mode=stat.S_IRUSR | stat.S_IWUSR,
+    )
+
+    with open(file_descriptor, "w") as f:
         # Lock the file to prevent other processes from writing to it at the same time
         fcntl.flock(f, fcntl.LOCK_EX)
         try:
